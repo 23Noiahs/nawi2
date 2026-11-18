@@ -1,0 +1,1319 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NAWI Lernseite – Ladung, Felder, Halbleiter, Magnetismus</title>
+<style>
+  :root{
+    --bg:#0b1220; --card:#141f33; --card2:#1a2942; --line:#2b3d5f;
+    --text:#e8eefb; --muted:#9db1d1; --acc:#38bdf8; --acc2:#f472b6;
+    --good:#4ade80; --bad:#f87171; --warn:#fbbf24;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    font-family:"Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+    background:radial-gradient(1200px 600px at 50% -10%, #16233d 0%, var(--bg) 60%);
+    color:var(--text); min-height:100vh; padding-bottom:90px;
+  }
+  header{
+    position:sticky; top:0; z-index:20; background:rgba(11,18,32,.92); backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--line); padding:12px 18px 0;
+  }
+  header h1{font-size:1.15rem; letter-spacing:.3px; display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+  header h1 .bolt{color:var(--warn);}
+  header h1 small{color:var(--muted); font-weight:400; font-size:.8rem;}
+  #progressWrap{height:6px; background:#1c2a44; margin-top:10px; border-radius:4px; overflow:hidden;}
+  #progress{height:100%; width:0%; background:linear-gradient(90deg,var(--acc),var(--acc2)); transition:width .3s;}
+  main{max-width:920px; margin:22px auto 0; padding:0 16px;}
+  .slide{display:none; animation:fade .35s ease;}
+  .slide.active{display:block;}
+  @keyframes fade{from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:none;}}
+  .card{
+    background:linear-gradient(180deg,var(--card2),var(--card));
+    border:1px solid var(--line); border-radius:16px; padding:22px;
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+  }
+  h2{font-size:1.45rem; margin-bottom:6px; color:var(--acc);}
+  h3{font-size:1.05rem; margin:16px 0 6px; color:var(--acc2);}
+  p{line-height:1.6; color:var(--text); margin:8px 0;}
+  .muted{color:var(--muted);}
+  .merksatz{
+    margin-top:14px; background:rgba(56,189,248,.1); border-left:4px solid var(--acc);
+    padding:12px 14px; border-radius:0 10px 10px 0; line-height:1.55;
+  }
+  .merksatz b{color:var(--acc);}
+  .formel{
+    display:inline-block; background:#0d1626; border:1px solid var(--line); border-radius:10px;
+    padding:8px 14px; margin:6px 4px; font-family:"Cascadia Code", Consolas, monospace; font-size:1rem; color:#fde68a;
+  }
+  .stage{
+    margin:14px 0; background:#0d1626; border:1px solid var(--line); border-radius:12px;
+    padding:12px; overflow:hidden;
+  }
+  canvas, svg{max-width:100%; display:block; margin:0 auto;}
+  .controls{display:flex; flex-wrap:wrap; gap:14px; align-items:center; margin:12px 0;}
+  .controls label{font-size:.9rem; color:var(--muted); display:flex; flex-direction:column; gap:4px; min-width:150px; flex:1;}
+  input[type=range]{width:100%; accent-color:var(--acc);}
+  .val{color:var(--acc); font-weight:600; font-variant-numeric:tabular-nums;}
+  button{
+    background:var(--acc); color:#06283d; border:none; border-radius:10px; padding:10px 18px;
+    font-weight:700; font-size:.95rem; cursor:pointer; transition:transform .1s, filter .15s;
+  }
+  button:hover{filter:brightness(1.1);} button:active{transform:scale(.97);}
+  button.secondary{background:#22345a; color:var(--text);}
+  button.pink{background:var(--acc2); color:#4a0f2b;}
+  button:disabled{opacity:.4; cursor:default;}
+  .btnrow{display:flex; gap:8px; flex-wrap:wrap;}
+  .out{
+    margin-top:10px; background:#0d1626; border:1px dashed var(--line); border-radius:10px;
+    padding:10px 14px; font-family:Consolas, monospace; font-size:.95rem; color:#a5f3fc; min-height:1.4em;
+  }
+  .out b{color:var(--warn);}
+  #dots{display:flex; gap:6px; flex-wrap:wrap; margin:14px 0 4px;}
+  #dots button{
+    width:26px; height:26px; padding:0; border-radius:50%; background:#22345a; color:var(--muted);
+    font-size:.7rem; font-weight:700;
+  }
+  #dots button.on{background:var(--acc); color:#06283d;}
+  nav.fix{
+    position:fixed; bottom:0; left:0; right:0; z-index:20; background:rgba(11,18,32,.95);
+    border-top:1px solid var(--line); padding:10px 16px;
+  }
+  nav.fix .inner{max-width:920px; margin:0 auto; display:flex; align-items:center; gap:12px;}
+  #counter{color:var(--muted); font-size:.85rem; min-width:56px; text-align:center; font-variant-numeric:tabular-nums;}
+  nav.fix button{flex:1; max-width:200px;}
+  .topiclist{display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:8px; margin-top:12px;}
+  .topic{
+    text-align:left; background:#22345a; color:var(--text); font-weight:600; padding:12px 14px; font-size:.92rem;
+  }
+  .topic span{display:block; font-weight:400; color:var(--muted); font-size:.78rem; margin-top:2px;}
+  .q{margin:14px 0; padding:14px; background:#0d1626; border:1px solid var(--line); border-radius:12px;}
+  .q .qt{font-weight:700; margin-bottom:10px;}
+  .q .opts{display:flex; flex-direction:column; gap:8px;}
+  .q .opts button{text-align:left; background:#1a2942; color:var(--text); font-weight:500;}
+  .q .opts button.correct{background:rgba(74,222,128,.25); border:1px solid var(--good); color:var(--good);}
+  .q .opts button.wrong{background:rgba(248,113,113,.2); border:1px solid var(--bad); color:var(--bad);}
+  .q .expl{display:none; margin-top:8px; color:var(--muted); font-size:.88rem; line-height:1.5;}
+  .q .expl.show{display:block;}
+  ul.check{list-style:none; padding-left:4px;}
+  ul.check li{padding:5px 0 5px 26px; position:relative; line-height:1.5;}
+  ul.check li::before{content:"⚡"; position:absolute; left:0;}
+  .grid2{display:grid; grid-template-columns:1fr 1fr; gap:14px;}
+  @media (max-width:640px){ .grid2{grid-template-columns:1fr;} }
+  .reib{display:flex; flex-direction:column; gap:4px; max-height:300px; overflow:auto; padding:4px;}
+  .reib button{
+    text-align:left; background:#1a2942; color:var(--text); font-weight:500; padding:8px 12px; font-size:.9rem;
+  }
+  .reib button.sel{background:var(--acc); color:#06283d;}
+  .reib button.sel2{background:var(--acc2); color:#4a0f2b;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1><span class="bolt">⚡</span> NAWI Lernlabor <small>4. Klasse · Physik: Ladung &amp; Elektrische Kraft · Magnetismus · Halbleiter</small></h1>
+  <div id="progressWrap"><div id="progress"></div></div>
+</header>
+
+<main id="main">
+
+  <section class="slide active" id="intro">
+    <div class="card">
+      <h2>Willkommen im NAWI Lernlabor 🎓</h2>
+      <p>Hier wird der <b>ganze Stoff interaktiv</b> erklärt – mit Animationen, die du selbst steuern kannst.
+      Geh mit <b>„Weiter →“</b> durch die Kapitel (Pfeiltasten ← → funktionieren auch) und klick dich auf dieser
+      Seite direkt zu einem Thema:</p>
+      <div class="topiclist">
+        <button class="topic" data-goto="1">1 · Elektrische Ladung<span>Protonen, Elektronen, neutral</span></button>
+        <button class="topic" data-goto="2">2 · Coulomb’sches Gesetz<span>Kraft nimmt mit 1/r² ab</span></button>
+        <button class="topic" data-goto="3">3 · Ladungserhaltung<span>Reibung überträgt Elektronen</span></button>
+        <button class="topic" data-goto="4">4 · Reibungselektrische Reihe<span>Wer gibt Elektronen ab?</span></button>
+        <button class="topic" data-goto="5">5 · Elektrisches Feld &amp; Feldlinien<span>Richtung &amp; Stärke sichtbar</span></button>
+        <button class="topic" data-goto="6">6 · Elektrische Feldstärke<span>E = F / Q</span></button>
+        <button class="topic" data-goto="7">7 · Kondensator<span>Ladung speichern</span></button>
+        <button class="topic" data-goto="8">8 · Halbleiter<span>Silizium, Löcher, Leitungselektronen</span></button>
+        <button class="topic" data-goto="9">9 · Dotierung<span>n- und p-Halbleiter</span></button>
+        <button class="topic" data-goto="10">10 · Transistor<span>npn / pnp, Schwellspannung</span></button>
+        <button class="topic" data-goto="11">11 · Magnetismus<span>Pole, ferromagnetisch, Feld</span></button>
+        <button class="topic" data-goto="12">12 · Lorentzkraft<span>Strom im Magnetfeld</span></button>
+        <button class="topic" data-goto="13">13 · Elektromagnet<span>Spule + Strom = Magnet</span></button>
+        <button class="topic" data-goto="14">14 · Elektromotor<span>Rotor, Kommutator</span></button>
+        <button class="topic" data-goto="15">15 · Quiz<span>Teste dein Wissen</span></button>
+        <button class="topic" data-goto="16">16 · Spickzettel<span>Alles auf einen Blick</span></button>
+      </div>
+      <div class="merksatz"><b>Tipp:</b> Nimm dir pro Kapitel 2–3 Minuten. Spiel mit den Reglern – so bleibt es hängen!</div>
+    </div>
+    <div id="dots"></div>
+  </section>
+
+  <section class="slide" id="ladung">
+    <div class="card">
+      <h2>1 · Elektrische Ladung</h2>
+      <p>Zwischen elektrisch geladenen Körpern wirken <b>anziehende oder abstoßende Kräfte</b> – z.&nbsp;B. stehen
+      die Haare zu Berge oder du bekommst einen kurzen Schlag.</p>
+      <p>Die <b>elektrische Ladung Q</b> gibt an, <b>wie stark ein Körper geladen ist</b>. Ist ein Körper
+      <b>elektrisch neutral</b>, gleichen sich die Ladungen von <b>Protonen (+)</b> und <b>Elektronen (−)</b> aus.
+      Gibt es einen Protonen- oder Elektronen-<b>Überschuss</b>, ist der Körper geladen.</p>
+      <div class="stage"><svg id="ladSvg" viewBox="0 0 640 300" width="640" height="300"></svg></div>
+      <div class="controls">
+        <div class="btnrow">
+          <button id="btnAddE">− Elektron hinzufügen</button>
+          <button id="btnRemE" class="secondary">− Elektron entfernen</button>
+        </div>
+      </div>
+      <div class="out" id="ladOut"></div>
+      <div class="merksatz"><b>Merksatz:</b> Q = (Anzahl Protonen − Anzahl Elektronen) · e. Gleich viele + und − → neutral. Mehr Elektronen → negativ geladen, mehr Protonen → positiv geladen.</div>
+    </div>
+    <div id="dots"></div>
+  </section>
+
+  <section class="slide" id="coulomb">
+    <div class="card">
+      <h2>2 · Coulomb’sches Gesetz</h2>
+      <p>Beschreibt die <b>elektrische Kraft zwischen zwei punktförmigen Ladungen</b>:</p>
+      <p style="text-align:center"><span class="formel">F = k · Q₁ · Q₂ / r² &nbsp;&nbsp; mit &nbsp; k = 8,99 · 10⁹ N·m²/C²</span></p>
+      <p>Die Kraft nimmt mit dem <b>Abstand ab</b>: Verdoppelst du den Abstand, misst du nur noch <b>¼ der Kraft</b> –
+      probier es mit dem Regler aus!</p>
+      <div class="stage"><svg id="coulSvg" viewBox="0 0 640 260" width="640" height="260"></svg></div>
+      <div class="controls">
+        <label>Q₁ <span class="val" id="q1v"></span><input type="range" id="q1" min="-5" max="5" step="0.5" value="3"></label>
+        <label>Q₂ <span class="val" id="q2v"></span><input type="range" id="q2" min="-5" max="5" step="0.5" value="-2"></label>
+        <label>Abstand r <span class="val" id="rv"></span><input type="range" id="r" min="0.2" max="1.2" step="0.05" value="0.4"></label>
+        <button id="btnDouble" class="pink">Abstand verdoppeln ⇢ ¼ Kraft!</button>
+      </div>
+      <div class="out" id="coulOut"></div>
+      <div class="merksatz"><b>Merksatz:</b> F ~ 1/r². Doppelter Abstand → vierfache Schwächung (¼). Gleiche Vorzeichen → abstoßend, ungleiche → anziehend.</div>
+    </div>
+    <div id="dots"></div>
+  </section>
+
+  <section class="slide" id="erhaltung">
+    <div class="card">
+      <h2>3 · Ladungserhaltung &amp; Ladungsübertragung</h2>
+      <p>Elektronen können z.&nbsp;B. <b>durch Reibung zweier Stoffe</b> von einem Stoff auf den anderen übertragen werden.
+      Elektronen werden dabei <b>niemals erzeugt oder zerstört</b> – sie werden nur übertragen. Deshalb ist
+      <b>Ladung eine Erhaltungsgröße</b>.</p>
+      <div class="stage"><canvas id="erhCanvas" width="640" height="260"></canvas></div>
+      <div class="controls">
+        <button id="btnRub" class="pink">⚡ Reiben!</button>
+        <button id="btnRubReset" class="secondary">Zurücksetzen</button>
+      </div>
+      <div class="out" id="erhOut"></div>
+      <div class="merksatz"><b>Merksatz:</b> Beim Reiben wandern <b>Elektronen</b> vom einen zum anderen Stoff – die <b>Gesamtladung bleibt immer gleich</b>.</div>
+    </div>
+    <div id="dots"></div>
+  </section>
+
+  <section class="slide" id="reibung">
+    <div class="card">
+      <h2>4 · Die reibungselektrische Reihe</h2>
+      <p>In dieser Reihe sind Stoffe danach geordnet, <b>wie bereit sie Elektronen abgeben</b>.
+      <b>Je weiter oben</b> ein Stoff steht, desto <b>leichter gibt er Elektronen</b> an einen Stoff ab, der <b>weiter unten</b> steht.</p>
+      <p class="muted">Klick zwei Stoffe an (erst den oberen, dann den unteren) und schau, wohin die Elektronen wandern:</p>
+      <div class="grid2">
+        <div class="stage"><div class="reib" id="reibList"></div></div>
+        <div>
+          <div class="out" id="reibOut" style="min-height:120px">Noch keine Stoffe gewählt …</div>
+          <div class="merksatz"><b>Merksatz:</b> Oben → gibt e⁻ ab (wird <b>+</b>). Unten → nimmt e⁻ auf (wird <b>−</b>).</div>
+        </div>
+      </div>
+    </div>
+    <div id="dots"></div>
+  </section>
+
+  <section class="slide" id="feld">
+    <div class="card">
+      <h2>5 · Das elektrische Feld &amp; Feldlinien</h2>
+      <p>Ein <b>elektrisches Feld</b> liegt vor, wenn jedem Punkt des Raums ein Wert zugeordnet ist. Es erstreckt sich
+      theoretisch bis ins Unendliche – seine Stärke nimmt aber immer weiter ab.</p>
+      <p><b>Feldlinien</b> zeigen die <b>Richtung der Kraft</b> (Pfeile). <b>Je weiter die Feldlinien auseinanderliegen,
+      desto kleiner ist dort die Kraft.</b> Fahr mit der Maus übers Feld, um die Feldrichtung an einem Punkt zu sehen!</p>
+      <div class="btnrow" style="margin:10px 0">
+        <button class="secondary fcfg" data-cfg="pm">+ und −</button>
+        <button class="secondary fcfg" data-cfg="mp">− und +</button>
+        <button class="secondary fcfg" data-cfg="pp">+ und +</button>
+        <button class="secondary fcfg" data-cfg="solo">nur eine +</button>
+      </div>
+      <div class="stage"><canvas id="feldCanvas" width="640" height="360"></canvas></div>
+      <div class="out" id="feldInfo">Punkt im Feld: —</div>
+      <div class="merksatz"><b>Merksatz:</b> Feldlinien beginnen an + und enden an −. Dichte der Linien = Stärke des Feldes.</div>
+    </div>
+    <div id="dots"></div>
+  </section>
+
+  <section class="slide" id="feldstaerke">
+    <div class="card">
+      <h2>6 · Elektrische Feldstärke</h2>
+      <p>Die <b>elektrische Feldstärke E</b> gibt an, welche <b>Krafteinwirkung eine Probeladung Q<sub>P</sub></b> im Feld
+      einer Ladung Q erfährt:</p>
+      <p style="text-align:center">
+        <span class="formel">E = F / Q<sub>P</sub></span>
+        <span class="formel">F = Q<sub>P</sub> · E</span>
+        <span class="formel">E = k · Q / r²</span>
+      </p>
+      <p>Rechne selbst: Wähle die felderzeugende Ladung Q, den Abstand r und die Probeladung Q<sub>P</sub>.</p>
+      <div class="controls">
+        <label>Q (Feldquelle) <span class="val" id="fsQv"></span><input type="range" id="fsQ" min="0.5" max="10" step="0.5" value="4"></label>
+        <label>Abstand r <span class="val" id="fsRv"></span><input type="range" id="fsR" min="0.1" max="2" step="0.05" value="0.5"></label>
+        <label>Q<sub>P</sub> (Probeladung) <span class="val" id="fsQPv"></span><input type="range" id="fsQP" min="1" max="100" step="1" value="10"></label>
+      </div>
+      <div class="out" id="fsOut"></div>
+      <div class="merksatz"><b>Merksatz:</b> E hängt nur von der Feldquelle (Q, r) ab – <b>nicht</b> von der Probeladung. Größere Probeladung → größere Kraft F = Q<sub>P</sub>·E bei gleichem E.</div>
+    </div>
+    <div id="dots"></div>
+  </section>
+
+  <section class="slide" id="kondensator">
+    <div class="card">
+      <h2>7 · Kondensator</h2>
+      <p>Ein Kondensator <b>speichert elektrische Ladung (Energie)</b> und stellt sie kurzfristig bereit.
+      Ändert sich die Spannung, gibt er die gespeicherte Ladung wieder ab.</p>
+      <p>Ein <b>Plattenkondensator</b> besteht aus <b>2 leitenden Flächen</b>; dazwischen bildet sich bei angelegter
+      Spannung ein <b>elektrisches Feld</b>. Anwendung: Touchscreens, LED-Schaltungen …</p>
+      <div class="stage"><svg id="kondSvg" viewBox="0 0 640 260" width="640" height="260"></svg></div>
+      <div class="controls">
+        <label>Spannung U <span class="val" id="kUv"></span><input type="range" id="kU" min="0" max="12" step="0.5" value="6"></label>
+        <button id="btnDischarge" class="pink">💡 Entladen (Lampe leuchtet!)</button>
+      </div>
+      <div class="out" id="kondOut"></div>
+      <div class="merksatz"><b>Merksatz:</b> Q = C·U (gespeicherte Ladung) und E = ½·C·U² (gespeicherte Energie). Mehr Spannung → mehr Ladung, stärkeres Feld zwischen den Platten.</div>
+    </div>
+    <div id="dots"></div>
+  </section>
+
+  <section class="slide" id="halbleiter">
+    <div class="card">
+      <h2>8 · Halbleiter (z. B. Silizium)</h2>
+      <p>Es gibt <b>Leiter</b> und <b>Nichtleiter</b> – und dazwischen die <b>Halbleiter</b> (z.&nbsp;B. <b>Silizium, Germanium,
+      Selen</b>). Sie sind die Basis der Elektronik: Handys, Computer, Fernseher …</p>
+      <p>Silizium hat <b>4 Valenzelektronen</b> (Außenschale). Im Kristallgitter sind alle 4 fest gebunden → keine frei
+      beweglichen Elektronen. Durch <b>Wärmezufuhr</b> können sich Elektronen lösen (<b>Leitungselektronen</b>) und
+      hinterlassen ein <b>Loch</b>. Das Loch verhält sich wie eine <b>positive Ladung</b> – anziehend auf Elektronen
+      (<b>Rekombination</b>). Legst du eine Spannung an, fließt Strom!</p>
+      <div class="stage"><canvas id="hlCanvas" width="680" height="340"></canvas></div>
+      <div class="controls">
+        <label>🌡️ Wärmezufuhr <span class="val" id="hlHeatV"></span><input type="range" id="hlHeat" min="0" max="100" step="1" value="30"></label>
+        <label style="flex-direction:row; align-items:center; min-width:auto; gap:8px; flex:0 0 auto">
+          <input type="checkbox" id="hlField" style="width:18px;height:18px;accent-color:var(--acc2)"> Spannung anlegen (Feld →)
+        </label>
+        <button id="btnHlReset" class="secondary">Zurücksetzen</button>
+      </div>
+      <div class="out" id="hlCount"></div>
+      <div class="merksatz"><b>Merksatz:</b> Reiner Halbleiter leitet kaum. Wärme löst Elektronen aus dem Gitter → Leitungselektron + Loch. Elektronen wandern zum +, Löcher „wandern“ zum −. Elektron trifft Loch → Rekombination.</div>
+    </div>
+    <div id="dots"></div>
+  </section>
+
+  <section class="slide" id="dotierung">
+    <div class="card">
+      <h2>9 · Dotierung: n- und p-Halbleiter</h2>
+      <p>Mischt man einem Halbleiter-Kristall gezielt Fremdatome bei, ändert sich die Leitfähigkeit stark:</p>
+      <ul class="check">
+        <li><b>n-Dotierung</b> („Negativ-Halbleiter“): Fremdatom aus der <b>5. Hauptgruppe</b> (z.&nbsp;B. Phosphor) hat 5 Valenzelektronen → 4 binden, <b>1 Elektron ist frei</b> → Elektronenüberschuss.</li>
+        <li><b>p-Dotierung</b> („Positiv-Halbleiter“): Fremdatom aus der <b>3. Hauptgruppe</b> (z.&nbsp;B. Bor) hat nur 3 Valenzelektronen → <b>1 Platz bleibt frei = Loch</b> → Elektronenmangel.</li>
+      </ul>
+      <div class="btnrow" style="margin:10px 0">
+        <button id="btnN">n-Dotierung (Phosphor, 5. HG)</button>
+        <button id="btnP" class="pink">p-Dotierung (Bor, 3. HG)</button>
+      </div>
+      <div class="stage"><canvas id="dotCanvas" width="680" height="320"></canvas></div>
+      <div class="out" id="dotOut"></div>
+    </div>
+    <div id="dots"></div>
+  </section>
+
+  <section class="slide" id="transistor">
+    <div class="card">
+      <h2>10 · Transistor</h2>
+      <p>Ein Transistor ist ein <b>Halbleiterbauelement zum Steuern/Verstärken niedriger Ströme</b>. Er besteht aus
+      <b>3 dotierten Schichten = 2 p-n-Übergängen</b> (Bipolartransistor): <b>npn</b> oder <b>pnp</b>.</p>
+      <p>Beim <b>npn-Transistor</b>: Liegt nur Spannung zwischen Emitter und Kollektor an, ist der obere p-n-Übergang in
+      <b>Sperrrichtung</b> → kein Kollektorstrom. Ist zusätzlich die <b>Basis-Emitter-Spannung größer als die
+      Schwellspannung</b> (ca. 0,7 V), fließt Basisstrom – und damit ein viel größerer Kollektorstrom!</p>
+      <div class="stage"><svg id="trSvg" viewBox="0 0 640 300" width="640" height="300"></svg></div>
+      <div class="controls">
+        <label>U<sub>BE</sub> (Basis-Emitter) <span class="val" id="trBEv"></span><input type="range" id="trBE" min="0" max="1.5" step="0.05" value="0"></label>
+        <label>U<sub>CE</sub> (Kollektor-Emitter) <span class="val" id="trCEv"></span><input type="range" id="trCE" min="0" max="12" step="0.5" value="6"></label>
+      </div>
+      <div class="out" id="trOut"></div>
+      <div class="merksatz"><b>Merksatz:</b> Kleiner Basisstrom (ab Schwellspannung ~0,7 V) steuert großen Kollektorstrom: I<sub>C</sub> ≈ β · I<sub>B</sub> (β = Verstärkungsfaktor, hier 100). Ohne U<sub>BE</sub> &gt; Schwellspannung: gesperrt.</div>
+    </div>
+    <div id="dots"></div>
+  </section>
+
+  <section class="slide" id="magnet">
+    <div class="card">
+      <h2>11 · Magnetismus</h2>
+      <p>Ein <b>Magnet</b> erzeugt in seiner Umgebung ein <b>magnetisches Feld</b>. <b>Dauermagnete</b> behalten ihre
+      magnetischen Eigenschaften dauerhaft. Stoffe, die von Magneten angezogen und dabei magnetisiert werden, heißen
+      <b>ferromagnetisch</b> (Eisen, Nickel, Cobalt + Legierungen).</p>
+      <ul class="check">
+        <li><b>Gleichnamige Pole stoßen sich ab, ungleichnamige ziehen sich an.</b></li>
+        <li>Die magnetische Wirkung ist an den <b>Polen am stärksten</b>.</li>
+        <li><b>Entmagnetisierung</b> durch Erhitzen oder starke Erschütterung.</li>
+      </ul>
+      <div class="stage"><canvas id="magCanvas" width="640" height="320"></canvas></div>
+      <div class="controls">
+        <div class="btnrow">
+          <button class="secondary" id="btnNS">🧲 Nord an Süd (anziehen)</button>
+          <button class="secondary" id="btnNN">🧲 Nord an Nord (abstoßen)</button>
+          <button class="secondary" id="btnHide">Kein 2. Magnet</button>
+        </div>
+      </div>
+      <div class="controls">
+        <span class="muted">Material testen:</span>
+        <div class="btnrow">
+          <button class="secondary mat" data-m="Eisen">Eisen</button>
+          <button class="secondary mat" data-m="Nickel">Nickel</button>
+          <button class="secondary mat" data-m="Cobalt">Cobalt</button>
+          <button class="secondary mat" data-m="Holz">Holz</button>
+          <button class="secondary mat" data-m="Kupfer">Kupfer</button>
+        </div>
+        <div class="btnrow">
+          <button class="pink" id="btnHeat">🔥 Erhitzen (entmagnetisieren)</button>
+          <button class="secondary" id="btnRemag">Neu magnetisieren</button>
+        </div>
+      </div>
+      <div class="out" id="magOut">Magnetfeld eines Stabmagneten – Feldlinien verlassen den Nordpol und treten am Südpol ein.</div>
+      <div class="merksatz"><b>Merksatz:</b> Gleichnamig = abstoßend, ungleichnamig = anziehend. Nur Fe/Ni/Co (ferromagnetisch) werden stark angezogen. Hitze/Erschütterung zerstört die Ordnung der Elementarmagnete → Entmagnetisierung.</div>
+    </div>
+    <div id="dots"></div>
+  </section>
+
+  <section class="slide" id="lorentz">
+    <div class="card">
+      <h2>12 · Magnetfelder durch Ströme &amp; Lorentzkraft</h2>
+      <p><b>Bewegte elektrische Ladungen erzeugen ein Magnetfeld</b> – und erfahren im Magnetfeld selbst eine Kraft:
+      die <b>Lorentzkraft</b>.</p>
+      <p style="text-align:center"><span class="formel">F = I · L · B (senkrecht zueinander) &nbsp; Richtung: Drei-Finger-Regel</span></p>
+      <p><b>Drei-Finger-Regel (rechte Hand):</b> Daumen = Strom I (Ursache), Zeigefinger = Magnetfeld B (Vermittlung),
+      Mittelfinger = Kraft F (Wirkung).</p>
+      <div class="stage"><canvas id="loCanvas" width="640" height="320"></canvas></div>
+      <div class="controls">
+        <label>Stromrichtung I
+          <select id="loI" style="background:#1a2942;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px;">
+            <option value="1">nach rechts →</option>
+            <option value="-1">nach links ←</option>
+          </select>
+        </label>
+        <label>Magnetfeld B
+          <select id="loB" style="background:#1a2942;color:var(--text);border:1px solid var(--line);border-radius:8px;padding:8px;">
+            <option value="-1">ins Bild hinein ⊗</option>
+            <option value="1">aus dem Bild heraus ⊙</option>
+          </select>
+        </label>
+        <label>Stromstärke I <span class="val" id="loIv"></span><input type="range" id="loIA" min="0" max="10" step="0.5" value="5"></label>
+        <label>Feldstärke B <span class="val" id="loBv"></span><input type="range" id="loBA" min="0" max="2" step="0.1" value="1"></label>
+      </div>
+      <div class="out" id="loOut"></div>
+      <div class="merksatz"><b>Merksatz:</b> F = I·L×B. Größerer Strom oder stärkeres Feld → größere Kraft. Richtung mit der Drei-Finger-Regel (Daumen I, Zeigefinger B, Mittelfinger F).</div>
+    </div>
+    <div id="dots"></div>
+  </section>
+
+  <section class="slide" id="elektromagnet">
+    <div class="card">
+      <h2>13 · Elektromagnet</h2>
+      <p>Eine <b>stromdurchflossene Spule</b> baut aufgrund des Stromflusses ein <b>Magnetfeld</b> auf – das ist ein
+      <b>Elektromagnet</b>. Schalte den Strom ab und das Feld verschwindet wieder. Ein <b>Eisenkern</b> verstärkt das
+      Feld stark.</p>
+      <div class="stage"><canvas id="emCanvas" width="640" height="320"></canvas></div>
+      <div class="controls">
+        <label>Stromstärke I <span class="val" id="emIv"></span><input type="range" id="emI" min="0" max="5" step="0.25" value="2"></label>
+        <label style="flex-direction:row; align-items:center; min-width:auto; gap:8px; flex:0 0 auto">
+          <input type="checkbox" id="emCore" checked style="width:18px;height:18px;accent-color:var(--acc2)"> Eisenkern
+        </label>
+      </div>
+      <div class="out" id="emOut"></div>
+      <div class="merksatz"><b>Merksatz:</b> Elektromagnet = Spule + Strom. Feldstärke wächst mit Stromstärke (und Windungszahl); Eisenkern verstärkt zusätzlich. Strom aus → Magnet aus.</div>
+    </div>
+    <div id="dots"></div>
+  </section>
+
+  <section class="slide" id="motor">
+    <div class="card">
+      <h2>14 · Elektromotor</h2>
+      <p>Aufbau: Ein <b>drehbarer Elektromagnet (Rotor/Anker)</b> sitzt im äußeren Magnetfeld der
+      <b>Dauermagnete (Statoren)</b> und ist über <b>Schleifkontakte (Bürsten)</b> mit einer Gleichspannungsquelle verbunden.</p>
+      <p>Fließt Strom durch den Rotor, wird er selbst zum Magneten: Sein Nordpol wird zum Südpol des Stators gezogen –
+      danach würde er stehen bleiben. Damit er sich <b>weiterdreht, polt der Kommutator den Strom bei einer bestimmten
+      Winkelstellung um</b>, sodass sich die Pole des Rotors wieder umkehren.</p>
+      <div class="stage"><canvas id="motorCanvas" width="420" height="380"></canvas></div>
+      <div class="controls">
+        <label>Drehzahl <span class="val" id="moSpeedV"></span><input type="range" id="moSpeed" min="1" max="10" step="1" value="5"></label>
+        <button id="btnMoPlay" class="pink">▶ Start / ⏸ Stopp</button>
+      </div>
+      <div class="out" id="moOut">Rotor steht. Starte den Motor!</div>
+      <div class="merksatz"><b>Merksatz:</b> Rotor im Statorfeld + Strom = Kraft auf die Leiterschleife → Drehung. Der <b>Kommutator</b> polt den Strom jede halbe Umdrehung um, damit die Drehung weitergeht.</div>
+    </div>
+    <div id="dots"></div>
+  </section>
+
+  <section class="slide" id="quiz">
+    <div class="card">
+      <h2>15 · Quiz – teste dich! 🧠</h2>
+      <p>Wähle bei jeder Frage die richtige Antwort. Du siehst sofort, ob es stimmt, und warum.</p>
+      <div id="quizBox"></div>
+      <div class="out" id="quizScore">Punkte: 0 / 0</div>
+      <div class="controls"><button id="btnQuizReset" class="secondary">Quiz neu starten</button></div>
+    </div>
+    <div id="dots"></div>
+  </section>
+
+  <section class="slide" id="fazit">
+    <div class="card">
+      <h2>16 · Spickzettel – alles auf einen Blick 📋</h2>
+      <h3>Elektrizität</h3>
+      <ul class="check">
+        <li>Ladung Q: Protonen(+) vs. Elektronen(−); neutral = Ausgleich; Überschuss = geladen.</li>
+        <li>Coulomb: F = k·Q₁Q₂/r² – doppelter Abstand → ¼ Kraft.</li>
+        <li>Ladung ist Erhaltungsgröße: Elektronen werden nur übertragen (z. B. Reibung), nie erzeugt/zerstört.</li>
+        <li>Reibungselektrische Reihe: weiter oben = gibt leichter e⁻ ab (wird +), weiter unten = nimmt auf (wird −).</li>
+        <li>Feldlinien: Richtung der Kraft; enger = stärker. Feld existiert theoretisch bis ∞, wird aber schwächer.</li>
+        <li>Feldstärke: E = F/Q<sub>P</sub> = k·Q/r². Kraft auf Probeladung: F = Q<sub>P</sub>·E.</li>
+        <li>Kondensator: 2 leitende Platten, speichert Ladung/Energie: Q = C·U, E = ½CU².</li>
+      </ul>
+      <h3>Halbleiter &amp; Bauteile</h3>
+      <ul class="check">
+        <li>Si/Ge/Se: 4 Valenzelektronen, im Gitter fest gebunden; Wärme → Leitungselektronen + Löcher (pos. Ladung) → Rekombination.</li>
+        <li>n-Dotierung: 5. HG (z. B. P) → Elektronenüberschuss. p-Dotierung: 3. HG (z. B. B) → Elektronenmangel (Löcher).</li>
+        <li>Transistor: 3 Schichten / 2 p-n-Übergänge (npn, pnp). U<sub>BE</sub> &gt; Schwellspannung (~0,7 V) → Basisstrom → I<sub>C</sub> ≈ β·I<sub>B</sub>.</li>
+      </ul>
+      <h3>Magnetismus</h3>
+      <ul class="check">
+        <li>Gleichnamige Pole stoßen ab, ungleichnamige ziehen an; stärkste Wirkung an den Polen.</li>
+        <li>Ferromagnetisch: Eisen, Nickel, Cobalt (+ Legierungen). Entmagnetisierung durch Erhitzen/Erschüttern.</li>
+        <li>Bewegte Ladungen erzeugen Magnetfeld und erfahren Lorentzkraft F = I·L·B (Drei-Finger-Regel).</li>
+        <li>Elektromagnet = stromdurchflossene Spule (+ Eisenkern). Motor: Rotor im Statorfeld, Kommutator polt Strom um.</li>
+      </ul>
+      <div class="merksatz" style="border-left-color:var(--good)"><b style="color:var(--good)">Viel Erfolg beim Test! 🍀</b> Wenn etwas unklar ist: Kapitel nochmal öffnen und mit den Reglern spielen.</div>
+    </div>
+    <div id="dots"></div>
+  </section>
+
+</main>
+
+<nav class="fix">
+  <div class="inner">
+    <button id="prevBtn" class="secondary">← Zurück</button>
+    <span id="counter"></span>
+    <button id="nextBtn">Weiter →</button>
+  </div>
+</nav>
+
+<script>
+(function(){
+"use strict";
+const $=id=>document.getElementById(id);
+const slides=[...document.querySelectorAll('.slide')];
+const hooks={};
+let current=0, stopCurrent=null;
+
+function register(id,fn){hooks[id]=fn;}
+
+function show(i){
+  i=Math.max(0,Math.min(slides.length-1,i));
+  current=i;
+  if(stopCurrent){try{stopCurrent();}catch(e){} stopCurrent=null;}
+  slides.forEach((s,j)=>s.classList.toggle('active',j===i));
+  document.querySelectorAll('#dots').forEach(dw=>{
+    [...dw.children].forEach((d,j)=>d.classList.toggle('on',j===i));
+  });
+  $('counter').textContent=(i+1)+' / '+slides.length;
+  $('prevBtn').disabled=(i===0);
+  $('nextBtn').disabled=(i===slides.length-1);
+  $('progress').style.width=((i+1)/slides.length*100)+'%';
+  window.scrollTo({top:0,behavior:'smooth'});
+  const h=hooks[slides[i].id];
+  if(h){const s=h(); if(typeof s==='function') stopCurrent=s;}
+}
+
+$('prevBtn').onclick=()=>show(current-1);
+$('nextBtn').onclick=()=>show(current+1);
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight') show(current+1);
+  if(e.key==='ArrowLeft') show(current-1);
+});
+document.querySelectorAll('.topic').forEach(b=>b.onclick=()=>show(parseInt(b.dataset.goto,10)));
+
+slides.forEach((s,i)=>{
+  const dw=document.createElement('div');
+  const b=document.createElement('button');
+  b.textContent=i+1; b.title='Kapitel '+(i+1);
+  b.onclick=()=>show(i);
+  dw.appendChild(b);
+  const host=s.querySelector('#dots');
+  host.replaceWith(dw); dw.id='dots';
+});
+
+const K=8.99e9;
+function fmt(x,d){
+  if(!isFinite(x)) return '—';
+  if(x===0) return '0';
+  const a=Math.abs(x);
+  if(a>=1e4||a<1e-2) return x.toExponential(2);
+  return x.toPrecision(d||3);
+}
+
+register('ladung',()=>{
+  const svg=$('ladSvg'); let P=6,E=6;
+  const NS='http://www.w3.org/2000/svg';
+  function draw(){
+    svg.innerHTML='';
+    const body=document.createElementNS(NS,'circle');
+    body.setAttribute('cx',320);body.setAttribute('cy',150);body.setAttribute('r',120);
+    body.setAttribute('fill','#1a2942');body.setAttribute('stroke','#38bdf8');body.setAttribute('stroke-width','3');
+    svg.appendChild(body);
+    const cap=document.createElementNS(NS,'text');
+    cap.setAttribute('x',320);cap.setAttribute('y',288);cap.setAttribute('fill','#9db1d1');
+    cap.setAttribute('text-anchor','middle');cap.setAttribute('font-size','13');
+    cap.textContent='Körper (z. B. Kugel)';
+    svg.appendChild(cap);
+    function dot(x,y,c,label){
+      const g=document.createElementNS(NS,'g');
+      const ci=document.createElementNS(NS,'circle');
+      ci.setAttribute('cx',x);ci.setAttribute('cy',y);ci.setAttribute('r',13);
+      ci.setAttribute('fill',c);g.appendChild(ci);
+      const t=document.createElementNS(NS,'text');
+      t.setAttribute('x',x);t.setAttribute('y',y+5);t.setAttribute('fill','#0b1220');
+      t.setAttribute('text-anchor','middle');t.setAttribute('font-weight','bold');t.setAttribute('font-size','15');
+      t.textContent=label;g.appendChild(t);svg.appendChild(g);
+    }
+    const cols=4, rows=Math.ceil((P+E)/cols);
+    let k=0;
+    for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+      if(k>=P+E)break;
+      const x=320-90+c*60, y=150-60+r*45;
+      if(k<P){dot(x,y,'#f87171','+');}else{dot(x,y,'#60a5fa','−');}
+      k++;
+    }
+    const q=(P-E);
+    $('ladOut').innerHTML='Protonen: <b>'+P+'</b> (+) &nbsp; Elektronen: <b>'+E+'</b> (−) &nbsp; ⇒ Q = <b>'+(q>0?'+':'')+q+'</b>·e &nbsp; → Körper ist <b>'+(q===0?'NEUTRAL':(q>0?'POSITIV':'NEGATIV'))+'</b> geladen';
+  }
+  $('btnAddE').onclick=()=>{E++;draw();};
+  $('btnRemE').onclick=()=>{if(E>0)E--;draw();};
+  draw();
+});
+
+register('coulomb',()=>{
+  const svg=$('coulSvg');
+  const NS='http://www.w3.org/2000/svg';
+  function draw(){
+    const q1=parseFloat($('q1').value), q2=parseFloat($('q2').value), r=parseFloat($('r').value);
+    $('q1v').textContent=q1+' µC'; $('q2v').textContent=q2+' µC'; $('rv').textContent=r.toFixed(2)+' m';
+    const F=K*(q1*1e-6)*(q2*1e-6)/(r*r);
+    svg.innerHTML='';
+    const x1=90, x2=90+r*440, y=130;
+    function charge(x,c,label){
+      const g=document.createElementNS(NS,'g');
+      const ci=document.createElementNS(NS,'circle');
+      ci.setAttribute('cx',x);ci.setAttribute('cy',y);ci.setAttribute('r',22);
+      ci.setAttribute('fill',c>0?'#f87171':'#60a5fa');g.appendChild(ci);
+      const t=document.createElementNS(NS,'text');
+      t.setAttribute('x',x);t.setAttribute('y',y+6);t.setAttribute('fill','#0b1220');
+      t.setAttribute('text-anchor','middle');t.setAttribute('font-weight','bold');t.setAttribute('font-size','18');
+      t.textContent=c>0?'+':'−';g.appendChild(t);
+      const l=document.createElementNS(NS,'text');
+      l.setAttribute('x',x);l.setAttribute('y',y+48);l.setAttribute('fill','#9db1d1');
+      l.setAttribute('text-anchor','middle');l.setAttribute('font-size','13');l.textContent=label;g.appendChild(l);
+      svg.appendChild(g);
+    }
+    charge(x1,q1,'Q₁ = '+q1+' µC'); charge(x2,q2,'Q₂ = '+q2+' µC');
+    const line=document.createElementNS(NS,'line');
+    line.setAttribute('x1',x1);line.setAttribute('y1',y+70);line.setAttribute('x2',x2);line.setAttribute('y2',y+70);
+    line.setAttribute('stroke','#2b3d5f');line.setAttribute('stroke-dasharray','5 5');svg.appendChild(line);
+    const rl=document.createElementNS(NS,'text');
+    rl.setAttribute('x',(x1+x2)/2);rl.setAttribute('y',y+92);rl.setAttribute('fill','#fde68a');
+    rl.setAttribute('text-anchor','middle');rl.setAttribute('font-size','14');
+    rl.textContent='r = '+r.toFixed(2)+' m';svg.appendChild(rl);
+    const rep=F>0;
+    const len=Math.min(120,Math.max(14,Math.abs(F)*4e4));
+    function arrow(x,dir,color){
+      const a=document.createElementNS(NS,'line');
+      a.setAttribute('x1',x);a.setAttribute('y1',y-34);
+      a.setAttribute('x2',x+dir*len);a.setAttribute('y2',y-34);
+      a.setAttribute('stroke',color);a.setAttribute('stroke-width','5');a.setAttribute('stroke-linecap','round');
+      svg.appendChild(a);
+      const tip=x+dir*len, s=dir>0?1:-1;
+      const p=document.createElementNS(NS,'polygon');
+      p.setAttribute('points',tip+','+(y-34)+' '+(tip-10*s)+','+(y-42)+' '+(tip-10*s)+','+(y-26));
+      p.setAttribute('fill',color);svg.appendChild(p);
+    }
+    if(rep){arrow(x1+26,-1,'#f472b6');arrow(x2-26,1,'#f472b6');}
+    else if(F<0){arrow(x1+26,1,'#4ade80');arrow(x2-26,-1,'#4ade80');}
+    $('coulOut').innerHTML='F = k·Q₁·Q₂/r² = <b>'+fmt(F)+' N</b> → <b>'+(F===0?'keine Kraft':(rep?'ABSTOßEND (gleiches Vorzeichen)':'ANZIEHEND (ungleiche Vorzeichen)'))+'</b>';
+  }
+  ['q1','q2','r'].forEach(id=>$(id).addEventListener('input',draw));
+  $('btnDouble').onclick=()=>{const r=parseFloat($('r').value); $('r').value=Math.min(1.2,r*2); draw();};
+  draw();
+});
+
+register('erhaltung',()=>{
+  const cv=$('erhCanvas'), ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  const protonsA=8, protonsB=8;
+  let eA=8, eB=8, anim=null, rubbed=false;
+  function reset(){eA=8;eB=8;rubbed=false;anim=null;draw(0);}
+  function draw(t){
+    ctx.clearRect(0,0,W,H);
+    function rod(x,label){
+      ctx.fillStyle='#5b4636'; ctx.fillRect(x,70,130,120);
+      ctx.strokeStyle='#8a6a4f'; ctx.lineWidth=3; ctx.strokeRect(x,70,130,120);
+      ctx.fillStyle='#e8eefb'; ctx.font='bold 14px sans-serif'; ctx.textAlign='center';
+      ctx.fillText(label,x+65,58);
+    }
+    rod(70,'Stab A'); rod(440,'Stab B');
+    ctx.fillStyle='#f87171'; ctx.font='bold 13px sans-serif';
+    for(let i=0;i<protonsA;i++){ctx.fillText('+',90+(i%4)*30,90+Math.floor(i/4)*30);}
+    for(let i=0;i<protonsB;i++){ctx.fillText('+',460+(i%4)*30,90+Math.floor(i/4)*30);}
+    ctx.fillStyle='#60a5fa';
+    const ea=Math.round(eA), eb=Math.round(eB);
+    for(let i=0;i<ea;i++){ctx.beginPath();ctx.arc(90+(i%4)*30,125+Math.floor(i/4)*30,6,0,7);ctx.fill();}
+    for(let i=0;i<eb;i++){ctx.beginPath();ctx.arc(460+(i%4)*30,125+Math.floor(i/4)*30,6,0,7);ctx.fill();}
+    if(anim!==null){
+      ctx.fillStyle='#4ade80';
+      for(let k=0;k<3;k++){
+        const sx=105+k*30, sy=215, ex=475+k*30, ey=215, p=anim;
+        const x=sx+(ex-sx)*p, y=sy+(ey-sy)*p - Math.sin(p*Math.PI)*40;
+        ctx.strokeStyle='rgba(74,222,128,.5)';ctx.lineWidth=1.5;
+        ctx.beginPath();ctx.moveTo(sx,sy);ctx.quadraticCurveTo((sx+ex)/2,sy-60,ex,ey);ctx.stroke();
+        ctx.beginPath();ctx.arc(x,y,7,0,7);ctx.fill();
+      }
+    }
+    const qa=(protonsA-ea), qb=(protonsB-eb);
+    $('erhOut').innerHTML='Q<sub>A</sub> = <b>'+(qa>0?'+':'')+qa+'</b>·e &nbsp; Q<sub>B</sub> = <b>'+(qb>0?'+':'')+qb+'</b>·e &nbsp; ⇒ Gesamt: <b>'+(qa+qb)+'</b>·e = <b>0 → Ladung erhalten!</b>'+(rubbed?' (3 Elektronen von A nach B gewandert)':'');
+  }
+  $('btnRub').onclick=()=>{
+    if(rubbed)return; rubbed=true;
+    const t0=performance.now();
+    (function step(now){
+      const t=Math.min(1,(now-t0)/1400);
+      eA=8-3*t; eB=8+3*t; anim=t;
+      draw(t);
+      if(t<1) requestAnimationFrame(step);
+      else {anim=null; eA=5; eB=11; draw(1);}
+    })(t0);
+  };
+  $('btnRubReset').onclick=reset;
+  reset();
+});
+
+register('reibung',()=>{
+  const reihe=['Glas','Menschliches Haar','Nylon','Wolle','Katzenfell','Seide','Papier','Baumwolle','Holz','Bernstein','Hartgummi','PVC','Teflon'];
+  const list=$('reibList');
+  let sel=null;
+  reihe.forEach((m,i)=>{
+    const b=document.createElement('button');
+    b.innerHTML=(i+1)+'. <b>'+m+'</b>'+(i===0?' &nbsp;▲ oben: gibt e⁻ ab':(i===reihe.length-1?' &nbsp;▼ unten: nimmt e⁻ auf':''));
+    b.onclick=()=>{
+      const btns=[...list.children];
+      if(sel===null){
+        sel=i; b.classList.add('sel');
+        $('reibOut').textContent='Erster Stoff gewählt: '+m+' – jetzt den zweiten anklicken (weiter unten in der Reihe).';
+      }else{
+        btns.forEach(x=>x.classList.remove('sel','sel2'));
+        if(sel===i){sel=null; $('reibOut').textContent='Noch keine Stoffe gewählt …'; return;}
+        const a=Math.min(sel,i), c=Math.max(sel,i);
+        btns[a].classList.add('sel'); btns[c].classList.add('sel2');
+        const oben=reihe[a], unten=reihe[c];
+        $('reibOut').innerHTML='<b>'+oben+'</b> steht weiter <b>oben</b> in der Reihe ⇒ gibt Elektronen an <b>'+unten+'</b> ab.<br>⇒ <b>'+oben+' wird positiv (+)</b>, <b>'+unten+' wird negativ (−)</b>. ⚡';
+        sel=null;
+      }
+    };
+    list.appendChild(b);
+  });
+});
+
+function drawFieldLines(ctx,W,H,charges,color){
+  ctx.clearRect(0,0,W,H);
+  function E(x,y){
+    let ex=0,ey=0;
+    for(const c of charges){
+      const dx=x-c.x,dy=y-c.y,d2=dx*dx+dy*dy,d=Math.sqrt(d2);
+      if(d<8){ex+=dx*1e7;ey+=dy*1e7;continue;}
+      const f=c.q/(d2*d); ex+=dx*f; ey+=dy*f;
+    }
+    return [ex,ey];
+  }
+  ctx.strokeStyle=color; ctx.lineWidth=1.3;
+  function trace(x,y,dir){
+    ctx.beginPath(); ctx.moveTo(x,y);
+    for(let s=0;s<600;s++){
+      const e=E(x,y), m=Math.hypot(e[0],e[1]); if(m===0)break;
+      x+=dir*e[0]/m*4; y+=dir*e[1]/m*4;
+      ctx.lineTo(x,y);
+      if(x<4||x>W-4||y<4||y>H-4)break;
+      let hit=false;
+      for(const c of charges){
+        if(c.q<0){
+          const d=Math.hypot(x-c.x,y-c.y);
+          if(d<13){ctx.lineTo(c.x+(x-c.x)/d*13,c.y+(y-c.y)/d*13);hit=true;break;}
+        }
+      }
+      if(hit)break;
+    }
+    ctx.stroke();
+  }
+  for(const c of charges){
+    const n=16;
+    for(let i=0;i<n;i++){
+      const a=i/n*Math.PI*2;
+      trace(c.x+Math.cos(a)*16, c.y+Math.sin(a)*16, 1);
+      trace(c.x+Math.cos(a)*16, c.y+Math.sin(a)*16, -1);
+    }
+  }
+  for(const c of charges){
+    ctx.beginPath();ctx.arc(c.x,c.y,11,0,7);
+    ctx.fillStyle=c.q>0?'#f87171':'#60a5fa';ctx.fill();
+    ctx.fillStyle='#0b1220';ctx.font='bold 15px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+    ctx.fillText(c.q>0?'+':'−',c.x,c.y+1);
+  }
+  ctx.textBaseline='alphabetic';
+  return E;
+}
+
+register('feld',()=>{
+  const cv=$('feldCanvas'), ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  const off=document.createElement('canvas'); off.width=W; off.height=H;
+  const offx=off.getContext('2d');
+  let Efn=null, cfg='pm';
+  const cfgs={
+    pm:[{x:210,y:180,q:1},{x:430,y:180,q:-1}],
+    mp:[{x:210,y:180,q:-1},{x:430,y:180,q:1}],
+    pp:[{x:210,y:180,q:1},{x:430,y:180,q:1}],
+    solo:[{x:320,y:180,q:1}]
+  };
+  function render(){
+    Efn=drawFieldLines(offx,W,H,cfgs[cfg],'rgba(56,189,248,.8)');
+    ctx.drawImage(off,0,0);
+  }
+  document.querySelectorAll('.fcfg').forEach(b=>b.onclick=()=>{cfg=b.dataset.cfg; render();});
+  function probe(ev){
+    const r=cv.getBoundingClientRect();
+    const x=(ev.clientX-r.left)*W/r.width, y=(ev.clientY-r.top)*H/r.height;
+    ctx.drawImage(off,0,0);
+    if(Efn){
+      const e=Efn(x,y), m=Math.hypot(e[0],e[1]);
+      if(m>1e-9){
+        const L=Math.min(60,20+m*0.0004);
+        ctx.strokeStyle='#fbbf24'; ctx.lineWidth=3;
+        ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x+e[0]/m*L,y+e[1]/m*L);ctx.stroke();
+        ctx.beginPath();ctx.arc(x,y,4,0,7);ctx.fillStyle='#fbbf24';ctx.fill();
+        $('feldInfo').innerHTML='Punkt ('+Math.round(x)+', '+Math.round(y)+'): E-Richtung = gelber Pfeil, |E| ∝ '+fmt(m*1e6,2)+' (relativ) – wo die Linien dichter sind, ist E größer.';
+      }
+    }
+  }
+  cv.addEventListener('mousemove',probe);
+  cv.addEventListener('mouseleave',()=>{ctx.drawImage(off,0,0);$('feldInfo').textContent='Punkt im Feld: —';});
+  render();
+  return ()=>{cv.removeEventListener('mousemove',probe);};
+});
+
+register('feldstaerke',()=>{
+  function draw(){
+    const Q=parseFloat($('fsQ').value)*1e-6, r=parseFloat($('fsR').value), QP=parseFloat($('fsQP').value)*1e-9;
+    $('fsQv').textContent=(Q*1e6)+' µC'; $('fsRv').textContent=r.toFixed(2)+' m'; $('fsQPv').textContent=(QP*1e9)+' nC';
+    const E=K*Q/(r*r), F=QP*E;
+    $('fsOut').innerHTML='E = k·Q/r² = <b>'+fmt(E)+' N/C</b><br>F = Q<sub>P</sub>·E = <b>'+fmt(F)+' N</b> auf die Probeladung';
+  }
+  ['fsQ','fsR','fsQP'].forEach(id=>$(id).addEventListener('input',draw));
+  draw();
+});
+
+register('kondensator',()=>{
+  const svg=$('kondSvg'), NS='http://www.w3.org/2000/svg';
+  const C=10e-6;
+  let flash=false;
+  function draw(){
+    const U=parseFloat($('kU').value);
+    $('kUv').textContent=U.toFixed(1)+' V';
+    const Q=C*U, E=0.5*C*U*U;
+    svg.innerHTML='';
+    function el(n,attrs){const e=document.createElementNS(NS,n);for(const k in attrs)e.setAttribute(k,attrs[k]);svg.appendChild(e);return e;}
+    el('rect',{x:180,y:60,width:18,height:140,fill:'#94a3b8',stroke:'#cbd5e1','stroke-width':2});
+    el('rect',{x:442,y:60,width:18,height:140,fill:'#94a3b8',stroke:'#cbd5e1','stroke-width':2});
+    el('text',{x:189,y:48,'text-anchor':'middle',fill:'#60a5fa','font-size':'15','font-weight':'bold'}).textContent='− Platte';
+    el('text',{x:451,y:48,'text-anchor':'middle',fill:'#f87171','font-size':'15','font-weight':'bold'}).textContent='+ Platte';
+    el('text',{x:189,y:225,'text-anchor':'middle',fill:'#9db1d1','font-size':'12'}).textContent='Minuspol';
+    el('text',{x:451,y:225,'text-anchor':'middle',fill:'#9db1d1','font-size':'12'}).textContent='Pluspol';
+    el('line',{x1:110,y1:130,x2:180,y2:130,stroke:'#38bdf8','stroke-width':3});
+    el('line',{x1:460,y1:130,x2:530,y2:130,stroke:'#38bdf8','stroke-width':3});
+    const nLines=Math.max(1,Math.round(U/12*10));
+    for(let i=0;i<nLines;i++){
+      const y=78+i*(104/Math.max(1,nLines-1));
+      el('line',{x1:206,y1:y,x2:428,y2:y,stroke:'rgba(56,189,248,'+Math.min(0.9,0.3+U*0.05)+')','stroke-width':2});
+      el('polygon',{points:'428,'+y+' 418,'+(y-5)+' 418,'+(y+5),fill:'rgba(56,189,248,.9)'});
+    }
+    const lampOn=flash;
+    el('circle',{cx:320,cy:130,r:lampOn?26:20,fill:lampOn?'#fde047':'#1a2942',stroke:lampOn?'#facc15':'#2b3d5f','stroke-width':3});
+    el('text',{x:320,y:172,'text-anchor':'middle',fill:'#9db1d1','font-size':'12'}).textContent='Lampe (Entladung)';
+    el('line',{x1:198,y1:130,x2:298,y2:130,stroke:'#2b3d5f','stroke-width':2});
+    el('line',{x1:342,y1:130,x2:442,y2:130,stroke:'#2b3d5f','stroke-width':2});
+    const nPlus=Math.round(U);
+    for(let i=0;i<nPlus;i++){
+      el('text',{x:451,y:78+i*11,fill:'#f87171','font-size':'13','font-weight':'bold'}).textContent='+';
+      el('text',{x:189,y:78+i*11,fill:'#60a5fa','font-size':'13','font-weight':'bold','text-anchor':'middle'}).textContent='−';
+    }
+    $('kondOut').innerHTML='U = <b>'+U.toFixed(1)+' V</b> ⇒ gespeicherte Ladung Q = C·U = <b>'+fmt(Q*1e6,3)+' µC</b> &nbsp;·&nbsp; Energie E = ½·C·U² = <b>'+fmt(E*1e3,3)+' mJ</b>'+(U>0?' &nbsp;·&nbsp; homogenes Feld zwischen den Platten (Pfeile →)':'');
+  }
+  $('kU').addEventListener('input',draw);
+  $('btnDischarge').onclick=()=>{
+    const U=parseFloat($('kU').value);
+    if(U===0){$('kondOut').textContent='Schon entladen (U = 0) – erst Spannung einstellen!';return;}
+    flash=true; draw();
+    $('kondOut').innerHTML+='<br>💡 <b>Entladung!</b> Die gespeicherte Ladung fließt ab – die Lampe leuchtet kurz auf …';
+    setTimeout(()=>{flash=false; $('kU').value=0; draw();},900);
+  };
+  draw();
+});
+
+register('halbleiter',()=>{
+  const cv=$('hlCanvas'), ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  const cols=10, rows=5, sx=64, sy=70, dx=62, dy=56;
+  const atoms=[];
+  for(let r=0;r<rows;r++)for(let c=0;c<cols;c++)atoms.push({x:sx+c*dx,y:sy+r*dy});
+  let electrons=[], holes=[], raf=null, last=0;
+  function spawn(){
+    const heat=parseFloat($('hlHeat').value)/100;
+    if(Math.random()<heat*0.045 && holes.length<atoms.length*0.5){
+      const a=atoms[Math.floor(Math.random()*atoms.length)];
+      if(!holes.some(h=>h.x===a.x&&h.y===a.y)){
+        holes.push({x:a.x,y:a.y});
+        electrons.push({x:a.x+10,y:a.y-10,vx:(Math.random()-0.5),vy:(Math.random()-0.5)});
+      }
+    }
+  }
+  function step(now){
+    const dt=Math.min(0.05,(now-last)/1000||0.016); last=now;
+    spawn();
+    const field=$('hlField').checked;
+    ctx.clearRect(0,0,W,H);
+    ctx.strokeStyle='#2b3d5f'; ctx.lineWidth=1.5;
+    for(const a of atoms)for(const b of atoms){
+      if((a.x===b.x&&Math.abs(a.y-b.y)===dy)||(a.y===b.y&&Math.abs(a.x-b.x)===dx)){
+        ctx.beginPath();ctx.moveTo(a.x,a.y);ctx.lineTo(b.x,b.y);ctx.stroke();
+      }
+    }
+    for(const a of atoms){
+      ctx.beginPath();ctx.arc(a.x,a.y,12,0,7);ctx.fillStyle='#334155';ctx.fill();ctx.strokeStyle='#64748b';ctx.stroke();
+      ctx.fillStyle='#e8eefb';ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText('Si',a.x,a.y+1);
+      const hasHole=holes.some(h=>h.x===a.x&&h.y===a.y);
+      const ve=hasHole?3:4;
+      ctx.fillStyle='#fbbf24';
+      for(let i=0;i<ve;i++){
+        const ang=-Math.PI/2+i/ve*Math.PI*2;
+        ctx.beginPath();ctx.arc(a.x+Math.cos(ang)*17,a.y+Math.sin(ang)*17,2.5,0,7);ctx.fill();
+      }
+    }
+    for(const h of holes){
+      ctx.beginPath();ctx.arc(h.x+17,h.y-17,7,0,7);
+      ctx.strokeStyle='#f472b6';ctx.setLineDash([3,3]);ctx.stroke();ctx.setLineDash([]);
+      ctx.fillStyle='#f472b6';ctx.font='bold 11px sans-serif';ctx.fillText('+',h.x+17,h.y-16);
+    }
+    for(let i=electrons.length-1;i>=0;i--){
+      const e=electrons[i];
+      e.vx+=(Math.random()-0.5)*1.4; e.vy+=(Math.random()-0.5)*1.4;
+      if(field)e.vx+=60*dt;
+      e.vx*=0.92; e.vy*=0.92;
+      e.x+=e.vx*dt*6; e.y+=e.vy*dt*6;
+      if(e.x<20){e.x=20;e.vx=Math.abs(e.vx);} if(e.x>W-20){e.x=W-20;e.vx=-Math.abs(e.vx);}
+      if(e.y<20){e.y=20;e.vy=Math.abs(e.vy);} if(e.y>H-20){e.y=H-20;e.vy=-Math.abs(e.vy);}
+      let rec=false;
+      for(let j=holes.length-1;j>=0;j--){
+        if(Math.hypot(e.x-holes[j].x,e.y-holes[j].y)<14){holes.splice(j,1);rec=true;break;}
+      }
+      if(rec){electrons.splice(i,1);continue;}
+      ctx.beginPath();ctx.arc(e.x,e.y,4.5,0,7);ctx.fillStyle='#60a5fa';ctx.fill();
+      ctx.fillStyle='#0b1220';ctx.font='bold 8px sans-serif';ctx.fillText('−',e.x,e.y+2.5);
+    }
+    if(field){
+      ctx.fillStyle='#f472b6';ctx.font='bold 13px sans-serif';ctx.textAlign='left';ctx.textBaseline='alphabetic';
+      ctx.fillText('Feld E → : Elektronen wandern zum +, Löcher effektiv zum −',12,22);
+    }
+    $('hlCount').innerHTML='Leitungselektronen: <b>'+electrons.length+'</b> &nbsp; Löcher: <b>'+holes.length+'</b>'+(holes.length>0?' &nbsp;·&nbsp; Elektron + Loch = <b>Rekombination</b> (verschwinden gemeinsam)':'');
+    raf=requestAnimationFrame(step);
+  }
+  $('hlHeat').addEventListener('input',()=>{$('hlHeatV').textContent=$('hlHeat').value+' %';});
+  $('hlHeatV').textContent='30 %';
+  $('btnHlReset').onclick=()=>{electrons=[];holes=[];};
+  raf=requestAnimationFrame(step);
+  return ()=>cancelAnimationFrame(raf);
+});
+
+register('dotierung',()=>{
+  const cv=$('dotCanvas'), ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  let mode='n', t0=performance.now(), raf=null;
+  function draw(now){
+    const t=(now-t0)/1000;
+    ctx.clearRect(0,0,W,H);
+    const cols=8, rows=5, sx=74, sy=56, dx=74, dy=54;
+    ctx.strokeStyle='#2b3d5f'; ctx.lineWidth=1.5;
+    for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+      if(c<cols-1){ctx.beginPath();ctx.moveTo(sx+c*dx,sy+r*dy);ctx.lineTo(sx+(c+1)*dx,sy+r*dy);ctx.stroke();}
+      if(r<rows-1){ctx.beginPath();ctx.moveTo(sx+c*dx,sy+r*dy);ctx.lineTo(sx+c*dx,sy+(r+1)*dy);ctx.stroke();}
+    }
+    const imp={x:sx+3*dx,y:sy+2*dy};
+    for(let r=0;r<rows;r++)for(let c=0;c<cols;c++){
+      const x=sx+c*dx,y=sy+r*dy;
+      const isImp=(x===imp.x&&y===imp.y);
+      ctx.beginPath();ctx.arc(x,y,12,0,7);
+      ctx.fillStyle=isImp?(mode==='n'?'#7c3aed':'#db2777'):'#334155';ctx.fill();
+      ctx.strokeStyle=isImp?'#fbbf24':'#64748b';ctx.lineWidth=isImp?3:1;ctx.stroke();
+      ctx.fillStyle='#fff';ctx.font='bold 10px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText(isImp?(mode==='n'?'P':'B'):'Si',x,y+1);
+      const ve=isImp?(mode==='n'?5:3):4;
+      ctx.fillStyle='#fbbf24';
+      for(let i=0;i<ve;i++){
+        const ang=-Math.PI/2+i/ve*Math.PI*2;
+        ctx.beginPath();ctx.arc(x+Math.cos(ang)*18,y+Math.sin(ang)*18,2.5,0,7);ctx.fill();
+      }
+      if(isImp&&mode==='n'){
+        const ex=imp.x+Math.cos(t*2)*36, ey=imp.y+Math.sin(t*2)*36;
+        ctx.beginPath();ctx.arc(ex,ey,5,0,7);ctx.fillStyle='#60a5fa';ctx.fill();
+        ctx.fillStyle='#0b1220';ctx.font='bold 9px sans-serif';ctx.fillText('−',ex,ey+3);
+      }
+      if(isImp&&mode==='p'){
+        ctx.beginPath();ctx.arc(imp.x+22,imp.y-20,7,0,7);
+        ctx.strokeStyle='#f472b6';ctx.setLineDash([3,3]);ctx.stroke();ctx.setLineDash([]);
+        ctx.fillStyle='#f472b6';ctx.font='bold 11px sans-serif';ctx.fillText('Loch +',imp.x+34,imp.y-16);
+      }
+    }
+    ctx.textBaseline='alphabetic';
+    if(mode==='n'){
+      $('dotOut').innerHTML='<b>n-Dotierung (Negativ-Halbleiter):</b> Phosphor (5. Hauptgruppe) ins Si-Gitter → 5 Valenzelektronen: 4 binden, <b>1 freies Elektron</b> (blau, bewegt sich) = Elektronenüberschuss. Majoritätsladungsträger: <b>Elektronen</b>.';
+    }else{
+      $('dotOut').innerHTML='<b>p-Dotierung (Positiv-Halbleiter):</b> Bor (3. Hauptgruppe) ins Si-Gitter → nur 3 Valenzelektronen: <b>1 Bindung bleibt unvollständig = Loch</b> (rosa +). Elektronenmangel. Majoritätsladungsträger: <b>Löcher</b>.';
+    }
+    raf=requestAnimationFrame(draw);
+  }
+  $('btnN').onclick=()=>{mode='n';};
+  $('btnP').onclick=()=>{mode='p';};
+  raf=requestAnimationFrame(draw);
+  return ()=>cancelAnimationFrame(raf);
+});
+
+register('transistor',()=>{
+  const svg=$('trSvg'), NS='http://www.w3.org/2000/svg';
+  const beta=100, RB=10000, Uth=0.7;
+  function draw(){
+    const ube=parseFloat($('trBE').value), uce=parseFloat($('trCE').value);
+    $('trBEv').textContent=ube.toFixed(2)+' V'; $('trCEv').textContent=uce.toFixed(1)+' V';
+    svg.innerHTML='';
+    function el(n,attrs){const e=document.createElementNS(NS,n);for(const k in attrs)e.setAttribute(k,attrs[k]);svg.appendChild(e);return e;}
+    function txt(x,y,s,attrs){const t=el('text',Object.assign({x:x,y:y,fill:'#e8eefb','font-size':14,'text-anchor':'middle'},attrs||{}));t.textContent=s;return t;}
+    const layers=[{x:230,w:60,label:'n',sub:'Emitter',c:'#60a5fa'},{x:290,w:60,label:'p',sub:'Basis',c:'#f472b6'},{x:350,w:60,label:'n',sub:'Kollektor',c:'#60a5fa'}];
+    layers.forEach(L=>{
+      el('rect',{x:L.x,y:90,width:L.w,height:120,fill:L.c,opacity:.25,stroke:L.c,'stroke-width':2});
+      txt(L.x+L.w/2,140,L.label,{'font-size':22,'font-weight':'bold'});
+      txt(L.x+L.w/2,165,L.sub,{'font-size':12,fill:'#9db1d1'});
+    });
+    txt(320,80,'npn-Transistor: Emitter – Basis – Kollektor',{'font-size':14,fill:'#38bdf8','font-weight':'bold'});
+    const on=ube>=Uth && uce>0;
+    const ib=on?(ube-Uth)/RB:0;
+    const ic=on?Math.min(beta*ib, uce/100):0;
+    el('line',{x1:260,y1:90,x2:260,y2:50,stroke:'#9db1d1','stroke-width':3});
+    el('line',{x1:320,y1:90,x2:320,y2:50,stroke:'#9db1d1','stroke-width':3});
+    el('line',{x1:380,y1:90,x2:380,y2:50,stroke:'#9db1d1','stroke-width':3});
+    txt(260,38,'E',{'font-weight':'bold'});txt(320,38,'B',{'font-weight':'bold'});txt(380,38,'C',{'font-weight':'bold'});
+    txt(200,55,'U_BE = '+ube.toFixed(2)+' V',{'text-anchor':'end','font-size':12,fill:ube>=Uth?'#4ade80':'#f87171'});
+    txt(440,55,'U_CE = '+uce.toFixed(1)+' V',{'text-anchor':'start','font-size':12,fill:'#9db1d1'});
+    function diode(x,y,onD){
+      el('line',{x1:x-16,y1:y,x2:x+16,y2:y,stroke:onD?'#4ade80':'#64748b','stroke-width':3});
+      el('polygon',{points:(x+16)+','+y+' '+(x-2)+','+(y-9)+' '+(x-2)+','+(y+9),fill:onD?'#4ade80':'#64748b'});
+      el('line',{x1:x+16,y1:y-11,x2:x+16,y2:y+11,stroke:onD?'#4ade80':'#64748b','stroke-width':3});
+    }
+    diode(290,120,ube>=Uth);
+    diode(350,120,on);
+    txt(290,105,'p-n-Übergang B–E',{'font-size':10,fill:'#9db1d1'});
+    txt(350,105,'p-n-Übergang B–C (Sperrrichtung, wenn nur U_CE)',{'font-size':10,fill:'#9db1d1'});
+    if(on){
+      function arrow(x1,y1,x2,y2,color,w){
+        el('line',{x1:x1,y1:y1,x2:x2,y2:y2,stroke:color,'stroke-width':w,'stroke-linecap':'round'});
+        const ang=Math.atan2(y2-y1,x2-x1);
+        el('polygon',{points:x2+','+y2+' '+(x2-12*Math.cos(ang-0.4))+','+(y2-12*Math.sin(ang-0.4))+' '+(x2-12*Math.cos(ang+0.4))+','+(y2-12*Math.sin(ang+0.4)),fill:color});
+      }
+      arrow(230,240,310,240,'#fbbf24',3);
+      txt(270,258,'I_B = '+fmt(ib*1e6,2)+' µA',{'font-size':11,fill:'#fbbf24'});
+      arrow(230,278,410,278,'#4ade80',6);
+      txt(320,296,'I_C = β·I_B ≈ '+fmt(ic)+' A (verstärkter Kollektorstrom)',{'font-size':11,fill:'#4ade80'});
+    }
+    $('trOut').innerHTML='U<sub>BE</sub> = <b>'+ube.toFixed(2)+' V</b> '+(ube<Uth?'&lt; Schwellspannung '+Uth+' V → oberer Übergang in <b>Sperrrichtung</b>, kein Kollektorstrom':'≥ Schwellspannung '+Uth+' V → Basisstrom fließt!')+'<br>'+
+      'I<sub>B</sub> = <b>'+fmt(ib*1e6,2)+' µA</b> &nbsp; I<sub>C</sub> = β·I<sub>B</sub> = <b>'+fmt(ic)+' A</b> &nbsp;(β = '+beta+')'+(on?' &nbsp;✅ verstärkt!':'');
+  }
+  ['trBE','trCE'].forEach(id=>$(id).addEventListener('input',draw));
+  draw();
+});
+
+register('magnet',()=>{
+  const cv=$('magCanvas'), ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  let second=null, demag=false, matMsg=null, matX=null;
+  function draw(){
+    const charges=demag?[]:[{x:250,y:160,q:1},{x:330,y:160,q:-1}];
+    drawFieldLines(ctx,W,H,charges,demag?'rgba(100,116,139,.4)':'rgba(56,189,248,.8)');
+    if(!demag){
+      ctx.fillStyle='#b91c1c'; ctx.fillRect(240,140,45,40);
+      ctx.fillStyle='#1d4ed8'; ctx.fillRect(335,140,45,40);
+      ctx.fillStyle='#fff'; ctx.font='bold 16px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText('N',262,161); ctx.fillText('S',357,161);
+      ctx.textBaseline='alphabetic';
+    }else{
+      ctx.fillStyle='#475569'; ctx.fillRect(240,140,140,40);
+      ctx.fillStyle='#94a3b8'; ctx.font='bold 13px sans-serif'; ctx.textAlign='center';
+      ctx.fillText('entmagnetisiert',310,161);
+    }
+    if(second){
+      const pole=second==='NS'?'S':'N';
+      ctx.fillStyle=second==='NS'?'#1d4ed8':'#b91c1c';
+      ctx.fillRect(440,140,50,40);
+      ctx.fillStyle='#fff'; ctx.font='bold 16px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(pole,465,161); ctx.textBaseline='alphabetic';
+      const dir=second==='NS'?-1:1;
+      const col=second==='NS'?'#4ade80':'#f87171';
+      ctx.strokeStyle=col; ctx.lineWidth=5; ctx.lineCap='round';
+      ctx.beginPath();ctx.moveTo(392,160);ctx.lineTo(392+dir*28,160);ctx.stroke();
+      ctx.fillStyle=col;
+      const tip=392+dir*28, ang=dir>0?0:Math.PI;
+      ctx.beginPath();ctx.moveTo(tip,160);ctx.lineTo(tip-10*Math.cos(ang-0.4),160-10*Math.sin(ang-0.4));ctx.lineTo(tip-10*Math.cos(ang+0.4),160-10*Math.sin(ang+0.4));ctx.fill();
+    }
+    if(matX!==null){
+      ctx.beginPath();ctx.arc(matX,255,10,0,7);
+      ctx.fillStyle='#cbd5e1';ctx.fill();ctx.strokeStyle='#64748b';ctx.stroke();
+    }
+    if(demag) $('magOut').textContent='🔥 Erhitzt → die Elementarmagnete sind ungeordnet → <b>entmagnetisiert</b>. „Neu magnetisieren“ stellt das Feld wieder her.';
+    else if(second==='NS') $('magOut').textContent='🧲 <b>Nord an Süd → ungleichnamige Pole ziehen sich an</b> (grüner Pfeil).';
+    else if(second==='NN') $('magOut').textContent='🧲 <b>Nord an Nord → gleichnamige Pole stoßen sich ab</b> (roter Pfeil).';
+    else $('magOut').textContent=matMsg||'Magnetfeld eines Stabmagneten – Feldlinien verlassen den Nordpol (N) und treten am Südpol (S) ein. An den Polen am dichtesten = stärkste Wirkung.';
+  }
+  $('btnNS').onclick=()=>{second='NS';matMsg=null;draw();};
+  $('btnNN').onclick=()=>{second='NN';matMsg=null;draw();};
+  $('btnHide').onclick=()=>{second=null;draw();};
+  $('btnHeat').onclick=()=>{demag=true;second=null;draw();};
+  $('btnRemag').onclick=()=>{demag=false;draw();};
+  document.querySelectorAll('.mat').forEach(b=>b.onclick=()=>{
+    const m=b.dataset.m, ferro=(m==='Eisen'||m==='Nickel'||m==='Cobalt');
+    matMsg=ferro?('<b>'+m+'</b> ist <b>ferromagnetisch</b> → wird vom Magneten <b>angezogen</b> und dabei magnetisiert! 🧲')
+                :('<b>'+m+'</b> ist <b>nicht ferromagnetisch</b> → wird (praktisch) <b>nicht angezogen</b>.');
+    matX=ferro?300:520;
+    draw();
+    setTimeout(()=>{matX=null;draw();},1200);
+  });
+  draw();
+});
+
+register('lorentz',()=>{
+  const cv=$('loCanvas'), ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  let raf=null;
+  function draw(){
+    const I=parseFloat($('loIA').value), B=parseFloat($('loBA').value);
+    const iDir=parseFloat($('loI').value), bDir=parseFloat($('loB').value);
+    $('loIv').textContent=I.toFixed(1)+' A'; $('loBv').textContent=B.toFixed(1)+' T';
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='rgba(148,163,184,.5)'; ctx.font='18px sans-serif'; ctx.textAlign='center';
+    for(let x=40;x<W;x+=55)for(let y=50;y<H;y+=55){ctx.fillText(bDir<0?'⊗':'⊙',x,y);}
+    ctx.fillStyle='#9db1d1'; ctx.font='12px sans-serif';
+    ctx.fillText('B = Magnetfeld '+(bDir<0?'ins Bild hinein (⊗)':'aus dem Bild heraus (⊙)'),W/2,24);
+    const cy=H/2+20;
+    const dirF=(iDir*bDir>0)?-1:1;
+    const defl=Math.min(46,I*B*9);
+    const oy=(I>0&&B>0)?dirF*defl:0;
+    ctx.strokeStyle='#cbd5e1'; ctx.lineWidth=8; ctx.lineCap='round';
+    ctx.beginPath();ctx.moveTo(80,cy+oy);ctx.lineTo(W-80,cy+oy);ctx.stroke();
+    ctx.strokeStyle='#fbbf24'; ctx.lineWidth=4;
+    ctx.beginPath();ctx.moveTo(80,cy+oy);ctx.lineTo(80+iDir*60,cy+oy);ctx.stroke();
+    const ang=iDir>0?0:Math.PI;
+    const tip=80+iDir*60;
+    ctx.fillStyle='#fbbf24';
+    ctx.beginPath();ctx.moveTo(tip,cy+oy);ctx.lineTo(tip-12*Math.cos(ang-0.4),cy+oy-12*Math.sin(ang-0.4));ctx.lineTo(tip-12*Math.cos(ang+0.4),cy+oy-12*Math.sin(ang+0.4));ctx.fill();
+    ctx.font='bold 13px sans-serif';
+    ctx.fillText('I',80+iDir*72,cy+oy-12);
+    if(I>0&&B>0){
+      const fx=W/2;
+      ctx.strokeStyle='#4ade80'; ctx.lineWidth=6;
+      ctx.beginPath();ctx.moveTo(fx,cy+oy);ctx.lineTo(fx,cy+oy+oy);ctx.stroke();
+      ctx.fillStyle='#4ade80';
+      const fy=cy+oy+oy;
+      ctx.beginPath();ctx.moveTo(fx,fy);ctx.lineTo(fx-10,fy-10);ctx.lineTo(fx+10,fy-10);ctx.fill();
+      ctx.font='bold 14px sans-serif';
+      ctx.fillText('F = I·L×B',fx+16,fy-8);
+      ctx.font='12px sans-serif';
+      ctx.fillText('Richtung: '+(oy<0?'nach OBEN ↑':'nach UNTEN ↓'),fx+16,fy+10);
+    }
+    const F=I*0.2*B;
+    $('loOut').innerHTML='F = I·L·B = <b>'+fmt(F)+' N</b> (L = 0,2 m) &nbsp;·&nbsp; Drei-Finger-Regel: Daumen I '+(iDir>0?'→ rechts':'← links')+', Zeigefinger B '+(bDir<0?'⊗ ins Bild':'⊙ aus dem Bild')+' ⇒ Mittelfinger F zeigt '+(I===0||B===0?'—':(oy<0?'nach OBEN ↑':'nach UNTEN ↓'));
+    raf=requestAnimationFrame(draw);
+  }
+  ['loIA','loBA','loI','loB'].forEach(id=>$(id).addEventListener('input',draw));
+  raf=requestAnimationFrame(draw);
+  return ()=>cancelAnimationFrame(raf);
+});
+
+register('elektromagnet',()=>{
+  const cv=$('emCanvas'), ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height;
+  let raf=null;
+  function draw(){
+    const I=parseFloat($('emI').value), core=$('emCore').checked;
+    $('emIv').textContent=I.toFixed(2)+' A';
+    ctx.clearRect(0,0,W,H);
+    const eff=I*(core?4:1);
+    if(eff>0){
+      const n=Math.min(10,Math.max(3,Math.round(eff*2)));
+      const seeds=[];
+      for(let i=0;i<n;i++){
+        seeds.push({x:200+Math.cos(i/n*6.28)*18,y:160+Math.sin(i/n*6.28)*18,q:1});
+        seeds.push({x:440+Math.cos(i/n*6.28)*18,y:160+Math.sin(i/n*6.28)*18,q:-1});
+      }
+      ctx.strokeStyle='rgba(56,189,248,'+Math.min(.9,.3+eff*.12)+')'; ctx.lineWidth=1.3;
+      function E(x,y){let ex=0,ey=0;for(const c of seeds){const dx=x-c.x,dy=y-c.y,d2=dx*dx+dy*dy,d=Math.sqrt(d2);if(d<6){ex+=dx*1e7;ey+=dy*1e7;continue;}const f=c.q/(d2*d);ex+=dx*f;ey+=dy*f;}return[ex,ey];}
+      for(const c of seeds){
+        for(const dir of [1,-1]){
+          let x=c.x,y=c.y;
+          ctx.beginPath();ctx.moveTo(x,y);
+          for(let s=0;s<500;s++){
+            const e=E(x,y),m=Math.hypot(e[0],e[1]);if(!m)break;
+            x+=dir*e[0]/m*4;y+=dir*e[1]/m*4;ctx.lineTo(x,y);
+            if(x<4||x>W-4||y<4||y>H-4)break;
+            let hit=false;
+            for(const o of seeds){if(o.q<0){const d=Math.hypot(x-o.x,y-o.y);if(d<12){ctx.lineTo(o.x+(x-o.x)/d*12,o.y+(y-o.y)/d*12);hit=true;break;}}}
+            if(hit)break;
+          }
+          ctx.stroke();
+        }
+      }
+    }
+    if(core){ctx.fillStyle='#64748b';ctx.fillRect(215,140,210,40);ctx.strokeStyle='#94a3b8';ctx.strokeRect(215,140,210,40);}
+    ctx.strokeStyle='#fbbf24'; ctx.lineWidth=4;
+    for(let i=0;i<7;i++){
+      const x=230+i*30;
+      ctx.beginPath();ctx.arc(x,160,14,Math.PI,0);ctx.stroke();
+      ctx.beginPath();ctx.arc(x,160,14,0,Math.PI);ctx.stroke();
+    }
+    ctx.fillStyle='#f87171';ctx.font='bold 15px sans-serif';ctx.textAlign='center';
+    ctx.fillText('S',458,166); ctx.fillText('N',182,166);
+    ctx.fillStyle='#9db1d1';ctx.font='12px sans-serif';
+    ctx.fillText('Spule (stromdurchflossen)'+(core?' + Eisenkern':''),320,235);
+    const clips=Math.min(12,Math.round(eff*2));
+    for(let i=0;i<clips;i++){
+      const cx=150-Math.min(55,i*4.5), cy=160-i*3;
+      ctx.strokeStyle='#cbd5e1';ctx.lineWidth=2.5;
+      ctx.beginPath();ctx.arc(cx,cy,7,Math.PI*0.2,Math.PI*1.6);ctx.stroke();
+      ctx.beginPath();ctx.arc(cx,cy,4,Math.PI*1.2,Math.PI*2.4);ctx.stroke();
+    }
+    ctx.fillStyle='#e8eefb';ctx.font='12px sans-serif';
+    ctx.fillText(clips>0?clips+' Büroklammern werden angezogen 👌':'Ohne Strom: kein Feld, keine Klammern',320,268);
+    $('emOut').innerHTML='I = <b>'+I.toFixed(2)+' A</b>'+(core?' + <b>Eisenkern</b> (verstärkt ca. ×4)':' (Luftkern)')+' ⇒ Feldstärke wächst mit I'+(core?' und Kern':'' )+' → <b>'+clips+' Klammern</b> angezogen. Strom aus → Feld weg.';
+    raf=requestAnimationFrame(draw);
+  }
+  $('emI').addEventListener('input',draw);
+  $('emCore').addEventListener('change',draw);
+  raf=requestAnimationFrame(draw);
+  return ()=>cancelAnimationFrame(raf);
+});
+
+register('motor',()=>{
+  const cv=$('motorCanvas'), ctx=cv.getContext('2d');
+  const W=cv.width,H=cv.height, cx=W/2, cy=H/2+10;
+  let angle=0, running=false, raf=null, last=0, currentSign=1;
+  function draw(now){
+    const dt=Math.min(0.05,(now-last)/1000||0.016); last=now;
+    if(running){
+      const speed=parseFloat($('moSpeed').value);
+      angle+=dt*speed*1.6;
+      currentSign=(Math.floor(angle/Math.PI)%2===0)?1:-1;
+    }
+    ctx.clearRect(0,0,W,H);
+    ctx.fillStyle='#1d4ed8'; ctx.fillRect(cx-90,10,180,34);
+    ctx.fillStyle='#fff'; ctx.font='bold 18px sans-serif'; ctx.textAlign='center'; ctx.textBaseline='middle';
+    ctx.fillText('N (Stator)',cx,28);
+    ctx.fillStyle='#b91c1c'; ctx.fillRect(cx-90,H-44,180,34);
+    ctx.fillStyle='#fff'; ctx.fillText('S (Stator)',cx,H-26);
+    ctx.strokeStyle='rgba(56,189,248,.5)'; ctx.lineWidth=1.5;
+    for(let i=-2;i<=2;i++){
+      ctx.beginPath();ctx.moveTo(cx+i*28,52);ctx.lineTo(cx+i*28,H-56);ctx.stroke();
+      ctx.fillStyle='rgba(56,189,248,.8)';
+      ctx.beginPath();ctx.moveTo(cx+i*28,H-56);ctx.lineTo(cx+i*28-5,H-66);ctx.lineTo(cx+i*28+5,H-66);ctx.fill();
+    }
+    ctx.save();
+    ctx.translate(cx,cy); ctx.rotate(angle);
+    ctx.strokeStyle='#fbbf24'; ctx.lineWidth=5;
+    ctx.strokeRect(-70,-24,140,48);
+    ctx.fillStyle='#fbbf24'; ctx.font='bold 18px sans-serif';
+    ctx.fillText(currentSign>0?'⊙':'⊗',-70,6);
+    ctx.fillText(currentSign>0?'⊗':'⊙',70,6);
+    ctx.restore();
+    ctx.beginPath();ctx.arc(cx,cy,8,0,7);ctx.fillStyle='#94a3b8';ctx.fill();
+    ctx.strokeStyle='#e2e8f0'; ctx.lineWidth=3;
+    ctx.beginPath();ctx.arc(cx,cy,34,Math.PI,0);ctx.stroke();
+    ctx.beginPath();ctx.arc(cx,cy,34,0,Math.PI);ctx.stroke();
+    ctx.fillStyle='#e2e8f0';
+    ctx.fillRect(cx-42,cy+30,12,8); ctx.fillRect(cx+30,cy+30,12,8);
+    ctx.fillStyle='#9db1d1'; ctx.font='11px sans-serif'; ctx.textBaseline='alphabetic';
+    ctx.fillText('Kommutator (2 Halbringe) + Bürsten',cx,H-4);
+    $('moOut').innerHTML='Drehwinkel: <b>'+Math.round((angle*180/Math.PI)%360)+'°</b> &nbsp;·&nbsp; Rotorstrom: <b>'+(currentSign>0?'+':'−')+'</b> (polt alle 180° um!) &nbsp;·&nbsp; '+(running?'▶ läuft':'⏸ pausiert');
+    raf=requestAnimationFrame(draw);
+  }
+  $('moSpeed').addEventListener('input',()=>{$('moSpeedV').textContent=$('moSpeed').value+'/10';});
+  $('moSpeedV').textContent='5/10';
+  $('btnMoPlay').onclick=()=>{running=!running;};
+  raf=requestAnimationFrame(draw);
+  return ()=>cancelAnimationFrame(raf);
+});
+
+const QUIZ=[
+  {q:'Verdoppelt man den Abstand zweier Ladungen, ist die Coulomb-Kraft …',o:['die Hälfte','nur noch ¼','doppelt so groß','viermal so groß'],c:1,e:'F ~ 1/r²: doppelter Abstand → (1/2)² = ¼ der Kraft.'},
+  {q:'Was ist eine Erhaltungsgröße?',o:['Die Temperatur','Die elektrische Ladung','Die Geschwindigkeit','Die Masse allein'],c:1,e:'Ladung bleibt erhalten: Elektronen werden nur übertragen, nie erzeugt oder zerstört.'},
+  {q:'In der reibungselektrischen Reihe …',o:['nimmt ein Stoff weiter oben Elektronen auf','gibt ein Stoff weiter oben leichter Elektronen an einen weiter unten ab','ist die Reihenfolge egal','werden Elektronen neu erzeugt'],c:1,e:'Je weiter oben, desto leichter gibt der Stoff Elektronen ab (wird +); weiter unten nimmt er auf (wird −).'},
+  {q:'Wo die elektrischen Feldlinien weiter auseinanderliegen, ist das Feld …',o:['stärker','schwächer','gleich stark','nicht definiert'],c:1,e:'Dichte der Feldlinien = Feldstärke. Weiter auseinander = schwächer.'},
+  {q:'Wie viele Valenzelektronen hat Silizium?',o:['3','4','5','8'],c:1,e:'Si, Ge und Se haben 4 Valenzelektronen – im Kristall gebunden, durch Wärme lösbar.'},
+  {q:'Bei der n-Dotierung fügt man Elemente welcher Hauptgruppe hinzu?',o:['3. Hauptgruppe','4. Hauptgruppe','5. Hauptgruppe','8. Hauptgruppe'],c:2,e:'5. HG (z. B. Phosphor): 5 VE → Elektronenüberschuss = negativer Halbleiter. p-Dotierung: 3. HG (z. B. Bor) → Löcher.'},
+  {q:'Beim npn-Transistor: Was passiert, wenn U_BE größer als die Schwellspannung (~0,7 V) ist?',o:['Nichts, der Transistor sperrt','Es fließt Basisstrom und ein verstärkter Kollektorstrom','Der Transistor schmilzt','Der Kollektor sperrt dauerhaft'],c:1,e:'Oberer p-n-Übergang sperrt allein; mit U_BE > Schwellspannung fließt I_B und I_C ≈ β·I_B.'},
+  {q:'Gleichnamige Magnetpole …',o:['ziehen sich an','stoßen sich ab','wirken nicht aufeinander','erzeugen nur Wärme'],c:1,e:'Gleichnamig = abstoßend, ungleichnamig (N-S) = anziehend. Stärkste Wirkung an den Polen.'},
+  {q:'Bewegte Ladungen …',o:['erzeugen kein Magnetfeld','erzeugen ein Magnetfeld und erfahren im Feld die Lorentzkraft','werden immer abgebremst','verlieren ihre Ladung'],c:1,e:'Bewegte Ladungen erzeugen ein Magnetfeld; im äußeren Feld wirkt F = I·L·B (Lorentzkraft).'},
+  {q:'Wozu dient der Kommutator im Elektromotor?',o:['Er polt den Strom im Rotor bei bestimmter Winkelstellung um','Er senkt die Spannung','Er erzeugt das Statorfeld','Er speichert Energie'],c:0,e:'Durch das Umpolen alle halbe Umdrehung dreht sich der Rotor weiter, statt stehenzubleiben.'}
+];
+register('quiz',()=>{
+  const box=$('quizBox');
+  let answered=0, score=0;
+  function render(){
+    box.innerHTML=''; answered=0; score=0;
+    $('quizScore').innerHTML='Punkte: <b>0</b> / 0 beantwortete von '+QUIZ.length;
+    QUIZ.forEach((item,i)=>{
+      const div=document.createElement('div'); div.className='q';
+      div.innerHTML='<div class="qt">'+(i+1)+'. '+item.q+'</div>';
+      const opts=document.createElement('div'); opts.className='opts';
+      item.o.forEach((o,j)=>{
+        const b=document.createElement('button'); b.textContent=o;
+        b.onclick=()=>{
+          if(div.dataset.done)return; div.dataset.done='1';
+          answered++;
+          [...opts.children].forEach((btn,k)=>{
+            if(k===item.c)btn.classList.add('correct');
+            else if(k===j)btn.classList.add('wrong');
+            btn.disabled=true;
+          });
+          if(j===item.c)score++;
+          const ex=document.createElement('div'); ex.className='expl show';
+          ex.textContent='💡 '+item.e; div.appendChild(ex);
+          $('quizScore').innerHTML='Punkte: <b>'+score+'</b> / '+answered+' beantwortete von '+QUIZ.length;
+        };
+        opts.appendChild(b);
+      });
+      div.appendChild(opts); box.appendChild(div);
+    });
+  }
+  render();
+  $('btnQuizReset').onclick=render;
+});
+
+show(0);
+})();
+</script>
+</body>
+</html>
